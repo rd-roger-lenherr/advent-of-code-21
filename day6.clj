@@ -1,29 +1,4 @@
-(ns day6
-  (:require [clojure.string :as str]))
-
-(defprotocol FishLifeCycle
-  (next-day [_])
-  (kids-count [_]))
-
-(defrecord Fish [cday kids]
-  FishLifeCycle
-  (next-day [it]
-    (cond-> it
-      (zero? cday) (-> (update :kids conj (->Fish 9 nil))
-                       (assoc :cday 7))
-      :else        (-> (update :cday dec)
-                       (update :kids (partial map next-day)))))
-
-  (kids-count [it]
-    (reduce #(+ %1 (kids-count %2)) (count kids) kids)))
-
-(defn- part1
-  [input]
-  (->> (reduce (fn [a _] (map #(next-day %) a)) input (range 80))
-       (map kids-count)
-       (apply +)
-       (+ (count input))
-       (println)))
+(ns day6)
 
 (defn- pond-next
   [pond]
@@ -34,15 +9,14 @@
                 {(dec day) count})))
        (apply merge-with +)))
 
-(let [starter
-      (->> #_[3 4 3 1 2]
-                   (str/split (slurp "input6.txt") #",")
-                   (map #(-> % str/trim Integer/parseInt))
-           )
-      pond
-      (reduce (fn [a day] (update a day (fnil inc 0))) (sorted-map) starter)]
-  (->> (reduce (fn [p _] (pond-next p)) pond (range 256))
+(defn- fish-total
+  [pond days]
+  (->> (reduce (fn [p _] (pond-next p)) pond (range days))
        (vals)
-       (apply +)
-       (println)
-   #_(pond-next pond)))
+       (apply +)))
+
+(let [input (->> (clojure.string/split (slurp "input6.txt") #",")
+                 (map #(-> % clojure.string/trim Integer/parseInt)))
+      pond (reduce (fn [pond day] (update pond day (fnil inc 0))) (sorted-map) input)]
+  (println "Part1: " (fish-total pond 80))
+  (println "Part2: " (fish-total pond 256)))
