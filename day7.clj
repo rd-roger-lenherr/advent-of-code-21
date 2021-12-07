@@ -23,7 +23,6 @@
 
 (let [sample (as-> (slurp "input7.txt") _
                (clojure.string/split _ #",")
-               (map clojure.string/trim _)
-               (map #(Integer/parseInt %) _))]
+               (map read-string _))]
   (println "Part 1 [pos fuel]: " (sweet-spot consumption-flat sample))
   (println "Part 2 [pos fuel]: " (sweet-spot consumption-rolling sample)))
