@@ -8,7 +8,7 @@
 (defn- consumption-rolling
   [pos xs]
   (->> (map #(-> (- pos %) Math/abs) xs)
-       (map #(->> (range 1 (inc %))  (reduce +)))
+       (map #(-> (inc %) (* %) (/ 2)))
        (reduce +)))
 
 (defn- sweet-spot
