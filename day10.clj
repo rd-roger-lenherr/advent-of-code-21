@@ -1,19 +1,6 @@
 (ns day10
   (:require [clojure.string :as str]
-            [clojure.zip :as z]
             [clojure.set :as set]))
-
-(def test-sample
-  "[({(<(())[]>[[{[]{<()<>>
-[(()[<>])]({[<{<<[]>>(
-{([(<{}[<>[]}>{[]{[(<()>
-(((({<>}<{<{<>}{[]{[]{}
-[[<[([]))<([[{}[[()]]]
-[{[{({}]{}}([{[{{{}}([]
-{<[[]]>}<{[{[{[]{()[[[]
-[<(<(<(<{}))><([]([]()
-<{([([[(<>()){}]>(<<{{
-<{([{{}}[<[[[<>{}]]]>[]]")
 
 ;; Typing characters is inconvenient => some helpers
 (def pairs (->> ["()" "{}" "[]" "<>"]
@@ -22,8 +9,7 @@
 (def open? (set (keys pairs)))
 (def close? (set (vals pairs)))
 (def incomplete? (partial every? open?))
-(def broken? (partial some? close?))
-(def score {\) 3 \] 57 \} 1197 \> 25137})
+(def broken? (partial some close?))
 
 (defn- parse
   ([cs] (parse (list) cs))
@@ -35,11 +21,25 @@
                         (parse (rest stack) cs)
                         (conj stack c)))))
 
-(let [lines (->> #_test-sample
-                 (slurp "input10.txt")
+(defn part1 [lines]
+  (let [score {\) 3 \] 57 \} 1197 \> 25137}]
+    (->> (map parse lines)
+         (remove incomplete?)
+         (map (comp score first))
+         (reduce +))))
+
+(defn part2 [lines]
+  (let [score {\) 1 \] 2 \} 3 \> 4}]
+    (->> (map parse lines)
+         (remove broken?)
+         (map (comp
+               (partial reduce #(+ (* 5 %1) %2) 0)
+               (partial map (comp score pairs))))
+         (sort)
+         (#(drop (int (/ (count %) 2)) %))
+         (first))))
+
+(let [lines (->> (slurp "input10.txt")
                  str/split-lines)]
-  (->> (map parse lines)
-       (remove incomplete?)
-       (map (comp score first))
-       (reduce +)
-       (clojure.pprint/pprint)))
+  (println (part1 lines))
+  (println (part2 lines)))
