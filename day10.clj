@@ -17,9 +17,9 @@
    (cond
      (nil? c) stack
      (open? c) (parse (conj stack c) cs)
-     (and (close? c)) (if (= (close->open c) (first stack))
-                        (parse (rest stack) cs)
-                        (conj stack c)))))
+     (close? c) (if (= (close->open c) (first stack))
+                  (parse (rest stack) cs)
+                  (conj stack c)))))
 
 (defn part1 [lines]
   (let [score {\) 3 \] 57 \} 1197 \> 25137}]
