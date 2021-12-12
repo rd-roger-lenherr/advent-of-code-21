@@ -2,13 +2,6 @@
   (:require [clojure.string :as str]
             [clojure.set :as set]))
 
-(def test-sample
-  "2199943210
-3987894921
-9856789892
-8767896789
-9899965678")
-
 (def lines->matrix
   (partial mapv (comp (partial mapv (comp read-string str)) seq)))
 
@@ -41,8 +34,9 @@
     [y x]))
 
 (defn- risen? [matrix ref-cord cord]
-  (let [expected (inc (get-in matrix ref-cord))]
-    (when (and (< expected 9) (= expected (get-in matrix cord)))
+  (let [prev   (get-in matrix ref-cord)
+        gotten (get-in matrix cord)]
+    (when (and (< gotten 9) (< prev gotten))
       cord)))
 
 (defn- basin [matrix found cord]
@@ -58,24 +52,15 @@
 (defn- part2 [matrix]
   (->> matrix
        (minima)
-       (map (comp #_count set (partial basin matrix '())))
-       ;; (sort >)
-       ;; (take 3)
-       #_(apply *)))
+       (map (comp count set (partial basin matrix '())))
+       (sort >)
+       (take 3)
+       (apply *)))
 
-(let [matrix (->> (or test-sample (slurp "input9.txt"))
+(let [matrix (->> (slurp "input9.txt")
                   str/split-lines
                   lines->matrix)]
-  ;; (println "Part 1:" (part1 matrix))
-  ;; (println "Part 2:" (part2 matrix))
-  (println :IS)
-  (clojure.pprint/pprint (->> (part2 matrix)
-                              (reduce into #{})
-                              (map (partial get-in matrix))
-                              (frequencies)
-                              (into (sorted-map))))
-  (clojure.pprint/pprint (dissoc (into (sorted-map) (frequencies (flatten matrix))) 9))
-  (println :SHOULD)
-  )
+  (println "Part 1:" (part1 matrix))
+  (println "Part 2:" (part2 matrix)))
 
 
