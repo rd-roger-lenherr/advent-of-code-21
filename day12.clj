@@ -52,12 +52,15 @@ start-RW")
 
 (defn tuples->input
   [tuples]
-  (-> (reduce (fn [m [k v]]
-                (-> m
-                    (update (keyword k) (fnil conj #{}) (keyword v))
-                    (update (keyword v) (fnil conj #{}) (keyword k))))
-              {} tuples)
-      (dissoc :end)))
+  (reduce (fn [m [sk sv]]
+            (let [k (keyword sk)
+                  v (keyword sv)]
+              (cond-> m
+                (not= k :end) (update k (fnil conj #{}) v)
+                (not= v :end) (update v (fnil conj #{}) k)
+                (= v :start)  (update k set/difference #{:start})
+                (= k :start)  (update v set/difference #{:start}))))
+          {} tuples))
 
 (defn- part1
   [input]
@@ -71,7 +74,7 @@ start-RW")
                  (map #(str/split % #"-"))
                  (tuples->input))]
   (println (part1 input))
-  #_(-> input
-      ;; (doto (println))
-      (chart)
+  (-> input
+      (doto (println))
+        ;; (chart)
       #_eof))
