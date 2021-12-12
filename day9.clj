@@ -41,8 +41,7 @@
 
 (defn- basin [matrix found cord]
   (let [check-next (some->> (neighbors+ matrix cord)
-                            (map (partial risen? matrix cord))
-                            (remove nil?))
+                            (filter (partial risen? matrix cord)))
         found-next (conj found cord)]
     (if (empty? check-next)
       found-next
