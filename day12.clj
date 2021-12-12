@@ -3,7 +3,6 @@
             [clojure.set :as set]))
 
 (defn small? [k] (let [s (name k)] (= s (str/lower-case s))))
-(def big? (complement small?))
 
 (defn options
   [input path current]
