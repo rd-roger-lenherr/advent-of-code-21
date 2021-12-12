@@ -21,15 +21,20 @@
                  (in [y (inc x)])))))
 
 (defn- minima [matrix]
-  (->> (for [y (range (count matrix))
-             x (range (count (first matrix)))]
-         (when (minima? [y x] matrix)
-           (get-in matrix [y x])))
-       (remove nil?)))
+  (for [y (range (count matrix))
+        x (range (count (first matrix)))
+        :when (minima? [y x] matrix)]
+    (get-in matrix [y x])))
 
-(->> (slurp "input9.txt")
-     (str/split-lines)
-     lines->matrix
-     minima
-     (map inc)
-     (reduce +))
+(defn- part1 [matrix]
+  (->> matrix
+       minima
+       (map inc)
+       (reduce +)))
+
+(let [matrix (->> (slurp "input9.txt")
+                  str/split-lines
+                  lines->matrix)]
+  (println "Part 1:" (part1 matrix)))
+
+
