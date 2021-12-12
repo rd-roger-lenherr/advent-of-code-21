@@ -46,8 +46,7 @@
                 (= k :start)  (update v set/difference #{:start}))))
           {} tuples))
 
-(let [sample nil
-      input (->> (slurp "input12.txt")
+(let [input (->> (slurp "input12.txt")
                  (str/split-lines)
                  (map #(str/split % #"-"))
                  (tuples->input))]
