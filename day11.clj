@@ -34,7 +34,7 @@
           grid (pos-for ready? grid)))
 
 (defn- step-2 [grid]
-  (if-not (seq (find-ready grid))
+  (if-not (seq (pos-for ready? grid))
     grid
     (recur (step-2-once grid))))
 
