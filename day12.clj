@@ -12,7 +12,7 @@
 
 (defn options-2
   [input path current]
-  (let [visited (filter small? path)
+  (let [visited (filter small? (conj path current))
         double? (->> (frequencies visited)
                      (some (fn [[k v]] (when (#{2} v) k))))]
     (cond-> (get input current)
@@ -33,8 +33,8 @@
   [choice-fn input]
   (->> (chart choice-fn input)
        (filter (comp #{:end} first))
-       (map reverse)
-       #_(count)))
+       ;; (map reverse)
+       (count)))
 
 (defn tuples->input
   [tuples]
@@ -69,13 +69,10 @@ kj-sa
 kj-HN
 kj-dc")
 
-(let [sample sample-l
+(let [sample nil
       input (->> (or sample (slurp "input12.txt"))
                  (str/split-lines)
                  (map #(str/split % #"-"))
                  (tuples->input))]
-  (println input)
   (println "Part 1:" (solve options input))
-  (->> (solve options-2 input)
-      (sort-by count)
-      clojure.pprint/pprint))
+  (println "Part 2:" (solve options-2 input)))
