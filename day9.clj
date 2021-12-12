@@ -24,17 +24,19 @@
   (for [y (range (count matrix))
         x (range (count (first matrix)))
         :when (minima? [y x] matrix)]
-    (get-in matrix [y x])))
+    [y x]))
 
 (defn- part1 [matrix]
   (->> matrix
        minima
-       (map inc)
+       (map (comp inc (partial get-in matrix)))
        (reduce +)))
 
-(let [matrix (->> (slurp "input9.txt")
+(let [matrix (->> (or test-sample (slurp "input9.txt"))
                   str/split-lines
                   lines->matrix)]
-  (println "Part 1:" (part1 matrix)))
+  ;; (println "Part 1:" (part1 matrix))
+  (->> matrix
+       minima))
 
 
