@@ -2,53 +2,39 @@
   (:require [clojure.string :as str]
             [clojure.set :as set]))
 
-(def test-sample
-  "start-A
-start-b
-A-c
-A-b
-b-d
-A-end
-b-end")
-
-(def test-sample-2
-  "fs-end
-he-DX
-fs-he
-start-DX
-pj-DX
-end-zg
-zg-sl
-zg-pj
-pj-he
-RW-he
-fs-DX
-pj-RW
-zg-RW
-start-pj
-he-WI
-zg-he
-pj-fs
-start-RW")
-
-(defn- small? [k] (let [s (name k)] (= s (str/lower-case s))))
+(defn small? [k] (let [s (name k)] (= s (str/lower-case s))))
 (def big? (complement small?))
 
 (defn options
   [input path current]
-  (let [taken (set (filter small? path))]
-    (set/difference (get input current) taken)))
+  (let [visited (set (filter small? path))]
+    (set/difference (get input current) visited)))
 
-(defn- chart
-  ([choice-fn input] (chart choice-fn input (list) (list) :start))
+(defn options-2
+  [input path current]
+  (let [visited (filter small? path)
+        double? (->> (frequencies visited)
+                     (some (fn [[k v]] (when (#{2} v) k))))]
+    (cond-> (get input current)
+      double? (set/difference (set visited)))))
+
+(defn chart
+  ([choice-fn input] (chart choice-fn input '() '() :start))
   ([choice-fn input paths path current]
-   (let [choices (choice-fn input path current)
+   (let [choices      (choice-fn input path current)
          current-path (conj path current)]
      (if (empty? choices)
        (conj paths current-path)
-       (reduce (fn [ps choice]
-                 (chart choice-fn input ps current-path choice))
+       (reduce (fn [paths choice]
+                 (chart choice-fn input paths current-path choice))
                paths choices)))))
+
+(defn solve
+  [choice-fn input]
+  (->> (chart choice-fn input)
+       (filter (comp #{:end} first))
+       (map reverse)
+       #_(count)))
 
 (defn tuples->input
   [tuples]
@@ -62,74 +48,34 @@ start-RW")
                 (= k :start)  (update v set/difference #{:start}))))
           {} tuples))
 
-(defn- solve
-  [choice-fn input]
-  (->> (chart choice-fn input)
-       (filter (comp #{:end} first))
-       (#(doto % (->> (map reverse) (group-by second) clojure.pprint/pprint)))
-       (count)))
+(def sample-s
+  "start-A
+start-b
+A-c
+A-b
+b-d
+A-end
+b-end")
 
-(defn options-2
-  [input path current]
-  (let [double? (->> (frequencies path)
-                     (some (fn [[k v]] (when (#{2} v) k))))]
-    (cond-> (get input current)
-      double? (set/difference (->> path (filter small?) set)))))
+(def sample-l
+  "dc-end
+HN-start
+start-kj
+dc-start
+dc-HN
+LN-dc
+HN-end
+kj-sa
+kj-HN
+kj-dc")
 
-(let [sample test-sample
+(let [sample sample-l
       input (->> (or sample (slurp "input12.txt"))
                  (str/split-lines)
                  (map #(str/split % #"-"))
                  (tuples->input))]
-  ;; (println "Part 1:" (solve options input))
-  (println "Part 2:" (solve options-2 input)))
-
-
-(set/difference
- (->>
-  "start,A,b,A,b,A,c,A,end
-start,A,b,A,b,A,end
-start,A,b,A,b,end
-start,A,b,A,c,A,b,A,end
-start,A,b,A,c,A,b,end
-start,A,b,A,c,A,c,A,end
-start,A,b,A,c,A,end
-start,A,b,A,end
-start,A,b,d,b,A,c,A,end
-start,A,b,d,b,A,end
-start,A,b,d,b,end
-start,A,b,end
-start,A,c,A,b,A,b,A,end
-start,A,c,A,b,A,b,end
-start,A,c,A,b,A,c,A,end
-start,A,c,A,b,A,end
-start,A,c,A,b,d,b,A,end
-start,A,c,A,b,d,b,end
-start,A,c,A,b,end
-start,A,c,A,c,A,b,A,end
-start,A,c,A,c,A,b,end
-start,A,c,A,c,A,end
-start,A,c,A,end
-start,A,end"
-  (str/split-lines)
-  (map #(str/split % #","))
-  (map (partial map keyword))
-  (into #{}))
-
- (into #{}
-          '((:start :A :end)
-            (:start :A :b :end)
-            (:start :A :b :d :b :end)
-            (:start :A :b :d :b :A :end)
-            (:start :A :b :d :b :A :c :A :end)
-            (:start :A :b :A :end)
-            (:start :A :b :A :b :end)
-            (:start :A :b :A :b :A :end)
-            (:start :A :b :A :b :A :c :A :end)
-            (:start :A :b :A :c :A :end)
-            (:start :A :c :A :end)
-            (:start :A :c :A :b :end)
-            (:start :A :c :A :b :A :end)
-            (:start :A :c :A :c :A :end)
-            (:start :A :c :A :c :A :b :end)
-            (:start :A :c :A :c :A :b :A :end))))
+  (println input)
+  (println "Part 1:" (solve options input))
+  (->> (solve options-2 input)
+      (sort-by count)
+      clojure.pprint/pprint))
