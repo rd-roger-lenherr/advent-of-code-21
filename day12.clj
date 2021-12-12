@@ -33,7 +33,6 @@
   [choice-fn input]
   (->> (chart choice-fn input)
        (filter (comp #{:end} first))
-       ;; (map reverse)
        (count)))
 
 (defn tuples->input
@@ -48,29 +47,8 @@
                 (= k :start)  (update v set/difference #{:start}))))
           {} tuples))
 
-(def sample-s
-  "start-A
-start-b
-A-c
-A-b
-b-d
-A-end
-b-end")
-
-(def sample-l
-  "dc-end
-HN-start
-start-kj
-dc-start
-dc-HN
-LN-dc
-HN-end
-kj-sa
-kj-HN
-kj-dc")
-
 (let [sample nil
-      input (->> (or sample (slurp "input12.txt"))
+      input (->> (slurp "input12.txt")
                  (str/split-lines)
                  (map #(str/split % #"-"))
                  (tuples->input))]
