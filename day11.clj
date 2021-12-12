@@ -28,7 +28,7 @@
 
 (def flashed 100)
 (def flashed? (partial < (dec flashed)))
-(defn ready? [i] (and (not (flashed? i)) (> i 8)))
+(defn ready? [i] (and (not (flashed? i)) (> i 9)))
 
 (defn- pos-for [f grid]
   (for [y (range (count grid))
@@ -57,17 +57,18 @@
   ([rounds grid] (part1 rounds grid 0))
   ([rounds grid flash-count]
    (if (zero? rounds)
-     grid
-     ;; flash-count
+     ;; grid
+     flash-count
      (let [grid-next (->> grid
                           (step-1)
                           (step-2))
            exhausted (pos-for flashed? grid-next)]
        (part1 (dec rounds) (reset grid-next exhausted) (+ flash-count (count exhausted)))))))
 
-(let [grid (->> test-sample
+(let [grid (->> #_test-sample
+                (slurp "input11.txt")
                 (str/split-lines)
                 (mapv (comp (partial mapv read-string) (partial re-seq #"\d"))))]
   (->> grid
-       (part1 1)
+       (part1 100)
        #_eof))
