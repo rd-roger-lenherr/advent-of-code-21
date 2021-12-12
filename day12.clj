@@ -4,13 +4,11 @@
 
 (defn small? [k] (let [s (name k)] (= s (str/lower-case s))))
 
-(defn options
-  [input path current]
+(defn options [input path current]
   (let [visited (set (filter small? path))]
     (set/difference (get input current) visited)))
 
-(defn options-2
-  [input path current]
+(defn options-2 [input path current]
   (let [visited (filter small? (conj path current))
         double? (->> (frequencies visited)
                      (some (fn [[k v]] (when (#{2} v) k))))]
@@ -28,14 +26,12 @@
                  (chart choice-fn input paths current-path choice))
                paths choices)))))
 
-(defn solve
-  [choice-fn input]
+(defn solve [choice-fn input]
   (->> (chart choice-fn input)
        (filter (comp #{:end} first))
        (count)))
 
-(defn tuples->input
-  [tuples]
+(defn tuples->input [tuples]
   (reduce (fn [m [sk sv]]
             (let [k (keyword sk)
                   v (keyword sv)]
