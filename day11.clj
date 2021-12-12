@@ -65,10 +65,19 @@
            exhausted (pos-for flashed? grid-next)]
        (part1 (dec rounds) (reset grid-next exhausted) (+ flash-count (count exhausted)))))))
 
+(defn- part2
+  ([grid] (part2 grid 0))
+  ([grid round]
+   (if (every? zero? (flatten grid))
+     round
+     (let [grid-next (->> grid step-1 step-2)
+           exhausted (pos-for flashed? grid-next)]
+       (recur (reset grid-next exhausted) (inc round))))))
+
 (let [grid (->> #_test-sample
                 (slurp "input11.txt")
                 (str/split-lines)
                 (mapv (comp (partial mapv read-string) (partial re-seq #"\d"))))]
   (->> grid
-       (part1 100)
+       (part2)
        #_eof))
