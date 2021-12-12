@@ -1,18 +1,6 @@
 (ns day11
   (:require [clojure.string :as str]))
 
-(def test-sample
-  "5483143223
-2745854711
-5264556173
-6141336146
-6357385478
-4167524645
-2176841721
-6882881134
-4846848554
-5283751526")
-
 (defn- step-1 [grid]
   (let [row-size (count (first grid))]
     (->> (flatten grid)
@@ -57,7 +45,6 @@
   ([rounds grid] (part1 rounds grid 0))
   ([rounds grid flash-count]
    (if (zero? rounds)
-     ;; grid
      flash-count
      (let [grid-next (->> grid
                           (step-1)
@@ -74,10 +61,8 @@
            exhausted (pos-for flashed? grid-next)]
        (recur (reset grid-next exhausted) (inc round))))))
 
-(let [grid (->> #_test-sample
-                (slurp "input11.txt")
+(let [grid (->> (slurp "input11.txt")
                 (str/split-lines)
                 (mapv (comp (partial mapv read-string) (partial re-seq #"\d"))))]
-  (->> grid
-       (part2)
-       #_eof))
+  (println (part1 100 grid))
+  (println (part2 grid)))
