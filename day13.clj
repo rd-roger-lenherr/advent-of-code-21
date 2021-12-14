@@ -26,6 +26,11 @@
        (into #{})
        (count)))
 
+(defn- part2 [folds coords]
+  (let [all-folds (->> (reverse folds) (map fold-fn) (apply comp))]
+    (->> (map all-folds coords)
+         (into #{}))))
+
 (defn- display [coords]
   (let [[xr yr]
         (->> coords
@@ -35,11 +40,6 @@
           x xr]
       (do (when (zero? x) (println))
           (doto (if (coords [x y]) "#" " ") print)))))
-
-(defn- part2 [folds coords]
-  (let [all-folds (->> (reverse folds) (map fold-fn) (apply comp))]
-    (->> (map all-folds coords)
-         (into #{}))))
 
 (let [[scoords _ sfolds] (->> (slurp "input13.txt")
                               (str/split-lines)
